@@ -2,7 +2,12 @@ package com.example.backend.controller;
 
 import com.example.backend.service.UserService;
 import com.example.backend.domain.User;
+import com.example.backend.security.CustomUserDetails;
+import com.example.backend.dto.LoginRequestDto;
+
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -19,18 +24,33 @@ public class LoginController {
 
     @GetMapping("/loginOk")
     public ResponseEntity<Map<String, String>> loginOk() {
+        // Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        // String userId = authentication.getName();
+        // String authorities = authentication.getAuthorities().toString();
+
+        // System.out.println("로그인한 유저 아이디:" + userId);
+        // System.out.println("유저 권한:" + authentication.getAuthorities());
+
+        // Map<String, String> userInfo = new HashMap<>();
+        // userInfo.put("userId", userId);
+        // userInfo.put("authorities", authorities);
+
+        // return ResponseEntity.ok(userInfo);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String userId = authentication.getName();
-        String authorities = authentication.getAuthorities().toString();
+        Object principal = (CustomUserDetails) authentication.getPrincipal();
 
-        System.out.println("로그인한 유저 아이디:" + userId);
-        System.out.println("유저 권한:" + authentication.getAuthorities());
-
-        Map<String, String> userInfo = new HashMap<>();
-        userInfo.put("userId", userId);
-        userInfo.put("authorities", authorities);
-
-        return ResponseEntity.ok(userInfo);
+        if (principal instanceof CustomUserDetails) {
+            CustomUserDetails user = (CustomUserDetails) principal;
+            LoginResponseDto dto = new LoginResponseDto(
+                    user.getUserId(),
+                    user.getName(),
+                    user.getRole()
+            );
+            return ResponseEntity.ok(dto);
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
     }
 
     @GetMapping("/logoutOk")

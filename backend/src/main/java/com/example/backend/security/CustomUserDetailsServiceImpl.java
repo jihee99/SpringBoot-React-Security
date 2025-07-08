@@ -11,10 +11,10 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 
 @Service
-public class UserDetailsServiceImpl implements UserDetailsService {
+public class CustomUserDetailsServiceImpl implements UserDetailsService {
     private final UserRepository userRepository;
 
-    public UserDetailsServiceImpl(UserRepository userRepository) {
+    public CustomUserDetailsServiceImpl(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
 
@@ -28,10 +28,19 @@ public class UserDetailsServiceImpl implements UserDetailsService {
         if (user == null) {
             throw new UsernameNotFoundException("User not found with id: " + userId);
         }
-        return new org.springframework.security.core.userdetails.User(
-                user.getUserId(),
-                user.getPassword(),
-                Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+        // return new org.springframework.security.core.userdetails.User(
+        //         user.getUserId(),
+        //         user.getPassword(),
+        //         Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole())));
+
+        return new CustomUserDetails(
+            user.getUserId(),
+            user.getName(),
+            user.getRole(),
+            user.getPassword(),
+            Collections.singleton(new SimpleGrantedAuthority("ROLE_" + user.getRole()))
+        );  
+
     }
 
 }
