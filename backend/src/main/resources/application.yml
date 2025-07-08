@@ -1,0 +1,13 @@
+spring:
+  logging:
+    level:
+      org.hibernate.SQL: debug
+      org.hibernate.type: trace
+
+  profiles:
+    active: dev
+
+  server:
+    servlet:
+      session:
+        timeout: 10m
